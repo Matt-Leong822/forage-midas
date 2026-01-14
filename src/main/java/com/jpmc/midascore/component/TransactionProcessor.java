@@ -13,10 +13,12 @@ public class TransactionProcessor {
 
     private final UserRepository userRepository;
     private final TransactionRepository transactionRecordRepository;
+    private final IncentiveClient incentiveClient;
 
-    public TransactionProcessor(UserRepository userRepository, TransactionRepository transactionRecordRepository) {
+    public TransactionProcessor(UserRepository userRepository, TransactionRepository transactionRecordRepository, IncentiveClient incentiveClient) {
         this.userRepository = userRepository;
         this.transactionRecordRepository = transactionRecordRepository;
+        this.incentiveClient = incentiveClient;
     }
 
     @Transactional
@@ -42,8 +44,10 @@ public class TransactionProcessor {
         if (sender.getBalance() < amount) 
             return;
 
+        float incentive = incentiveClient.getIncentiveAmount(transaction);
+
         // record transaction
-        transactionRecordRepository.save(new TransactionRecord(sender, recipient, amount));
+        transactionRecordRepository.save(new TransactionRecord(sender, recipient, amount, incentive));
 
         // update balances
         sender.setBalance(sender.getBalance() - amount);
@@ -51,6 +55,6 @@ public class TransactionProcessor {
 
         // persist balance updates
         userRepository.save(sender);
-        userRepository.save(recipient); //add a breakpoint here to debug user balance updates for task 3
+        userRepository.save(recipient); //add a breakpoint here to debug user balance updates for tasks 3 and 4
     }
 }
