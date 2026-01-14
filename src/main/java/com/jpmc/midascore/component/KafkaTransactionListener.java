@@ -10,7 +10,6 @@ public class KafkaTransactionListener {
 
     @KafkaListener(topics = "${general.kafka-topic}", groupId = "midas-core")
     public void listen(Transaction transaction) {
-        System.out.println("received amount=" + transaction.getAmount());
         transaction.getAmount();
     }
     
